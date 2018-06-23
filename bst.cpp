@@ -75,9 +75,6 @@ public:
         }
         return *this;
     }
-
-
-
 };
 
 template <class T>
@@ -86,8 +83,14 @@ class BST
 private:
     Node<T>* root;
     size_t size;
+    int quantity;
 
 public:
+
+    int get_quantity()
+    {
+        return quantity;
+    }
 
     void copy_bst(Node<T>*& curr, Node<T>& other)
     {
@@ -104,12 +107,14 @@ public:
     BST()
     {
         root = nullptr;
+        quantity = 0;
     }
 
     BST(const BST*& other)
     {
         if (other.root != nullptr)
             copy_bst(this->root, other.root);
+        this->quantity = other.quantity;
     }
 
     ~BST()
@@ -188,6 +193,7 @@ public:
     BST_iter<T> insert_(const T& data)
     {
         size++;
+        quantity++;
         Node<T>* res = root;
         insert_node(root, data, &res);
         return BST_iter<T>(res);
@@ -206,11 +212,15 @@ public:
         else if (data > root->data)
             insert_node(root->right, data, res);
         if (data == root->data)
+        {
+            BST::quantity--;
             return;
+        }
     }
 
     BST_iter<T> delete_(const T& data){
         size--;
+        quantity--;
         Node<T>* res;
         delete_node(root, data, &res);
         return BST_iter<T>(res);
@@ -219,7 +229,10 @@ public:
     void delete_node(Node<T>*& root, T data, Node<T>** res)
     {
         if (root == nullptr)
+        {
+            quantity++;
             return;
+        }
         if (root->data < data)
             delete_node(root->right, data, res);
         if (root->data > data)
@@ -253,8 +266,6 @@ public:
     }
 };
 
-
-
 int main()
 {
     BST<int> bst1;
@@ -270,9 +281,12 @@ int main()
 
     BST<int> bst2 = bst1;
 
-    for (BST_iter<int> i = bst2.begin(); i != ((bst2.begin()++)++)++; ++i)
+    int counter = 0;
+    for (BST_iter<int> i = bst2.begin(); counter < bst2.get_quantity(); counter++)
     {
         cout << *i << endl;
+        if (counter != bst2.get_quantity() - 1)
+            ++i;
     }
     return 0;
 }
